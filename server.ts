@@ -553,7 +553,7 @@ async function generateContentWithRetry(
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   // Aumenta o limite de payload para suportar o upload de imagens/vídeos em Base64
   app.use(express.json({ limit: '50mb' }));
