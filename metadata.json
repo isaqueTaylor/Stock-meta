@@ -1,0 +1,6 @@
+{
+  "name": "Gerador de Título e Palavras-chave para Adobe Stock",
+  "description": "Faça o upload de uma imagem para gerar um título otimizado para SEO e palavras-chave relevantes para o Adobe Stock usando IA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
