@@ -347,8 +347,8 @@ export const PromptGenerator: React.FC<PromptGeneratorProps> = ({
       {/* ABA 1: GERADOR INTELIGENTE COM IA */}
       {activeTab === 'ai' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Coluna Esquerda: Formulário de Configuração (5 colunas) - Fixa no topo ao rolar */}
-          <div className="lg:col-span-5 bg-slate-900/60 border border-slate-900/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-6 lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto custom-scrollbar">
+          {/* Coluna Esquerda: Formulário de Configuração (5 colunas) - Fixa no topo sem rolagem */}
+          <div className="lg:col-span-5 bg-slate-900/60 border border-slate-900/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-6 lg:sticky lg:top-6 lg:self-start">
             {/* PASSO 1: PALAVRAS-CHAVE DA IMAGEM */}
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -684,8 +684,8 @@ export const PromptGenerator: React.FC<PromptGeneratorProps> = ({
             </button>
           </div>
 
-          {/* Coluna Direita: Variações Geradas (7 colunas) */}
-          <div className="lg:col-span-7 space-y-4">
+          {/* Coluna Direita: Variações Geradas (7 colunas) - Área com Rolagem Dedicada */}
+          <div className="lg:col-span-7 flex flex-col space-y-4 lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-3rem)]">
             {isLoading && (
               <div className="bg-slate-900/40 border border-slate-900 rounded-2xl p-12 flex flex-col items-center justify-center text-center space-y-4 backdrop-blur-sm">
                 <div className="relative">
@@ -720,15 +720,16 @@ export const PromptGenerator: React.FC<PromptGeneratorProps> = ({
             )}
 
             {!isLoading && generatedVariations.length > 0 && (
-              <div className="space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+              <div className="flex flex-col space-y-3 min-h-0 flex-1">
+                {/* Barra de Ações Fixa no Topo da Área dos Prompts */}
+                <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-slate-900/80 border border-slate-800/80 rounded-xl backdrop-blur-sm shrink-0 shadow-md">
                   <div>
-                    <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                    <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
                       <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
                       <span>{generatedVariations.length} {generatedVariations.length === 1 ? 'Prompt Comercial Gerado' : 'Prompts Comerciais Gerados'}</span>
                     </h3>
-                    <span className="text-[11px] text-slate-400">
-                      Baseados nas palavras: <strong className="text-indigo-300 font-semibold">{parsedWords.length > 0 ? parsedWords.join(', ') : idea}</strong>
+                    <span className="text-[11px] text-slate-400 truncate max-w-xs block">
+                      Palavras: <strong className="text-indigo-300 font-semibold">{parsedWords.length > 0 ? parsedWords.join(', ') : idea}</strong>
                     </span>
                   </div>
 
@@ -759,7 +760,9 @@ export const PromptGenerator: React.FC<PromptGeneratorProps> = ({
                   </div>
                 </div>
 
-                {generatedVariations.map((variation, index) => (
+                {/* Lista Exclusiva de Prompts com Rolagem (Área de Prompts com scroll interno) */}
+                <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1 max-h-[calc(100vh-8.5rem)]">
+                  {generatedVariations.map((variation, index) => (
                   <div
                     key={variation.id}
                     className="bg-slate-900/60 border border-slate-850 hover:border-indigo-500/40 rounded-2xl p-5 shadow-xl transition-all space-y-3 group"
@@ -909,6 +912,7 @@ export const PromptGenerator: React.FC<PromptGeneratorProps> = ({
                     )}
                   </div>
                 ))}
+                </div>
               </div>
             )}
           </div>
