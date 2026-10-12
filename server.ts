@@ -428,10 +428,10 @@ function getResponseText(response: any): string {
 }
 
 const FALLBACK_CHAIN: Record<string, string> = {
-  'gemini-3.8-flash': 'gemini-3.7-flash',
-  'gemini-3.7-flash': 'gemini-flash-latest',
+  'gemini-3.8-flash': 'gemini-flash-latest',
   'gemini-flash-latest': 'gemini-3.1-flash-lite',
-  'gemini-3.1-flash-lite': 'gemini-3.8-flash'
+  'gemini-3.1-flash-lite': 'gemini-3.8-flash',
+  'gemini-3.7-flash': 'gemini-3.8-flash'
 };
 
 async function generateContentWithRetry(
@@ -651,7 +651,7 @@ async function startServer() {
         let visionResponse;
         try {
           visionResponse = await generateContentWithRetry(geminiAi, {
-            model: 'gemini-3.7-flash',
+            model: 'gemini-3.8-flash',
             contents: {
               parts: [
                 { inlineData: { mimeType: normalizedMimeType, data: cleanBase64 } },
@@ -778,7 +778,7 @@ Saída apenas em JSON puro com chaves "title", "keywords" e "category".`;
         };
 
         const response = await generateContentWithRetry(geminiAi, {
-          model: 'gemini-3.7-flash',
+          model: 'gemini-3.8-flash',
           contents: {
             parts: parts,
           },
