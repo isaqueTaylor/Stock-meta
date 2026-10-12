@@ -145,12 +145,15 @@ export const PromptGenerator: React.FC<PromptGeneratorProps> = ({
     setSavedPrompts(getSavedPrompts());
   }, []);
 
+  const [copiedIds, setCopiedIds] = useState<Set<string>>(new Set());
+
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
+    setCopiedIds(prev => new Set(prev).add(id));
     setTimeout(() => {
       setCopiedId(null);
-    }, 2000);
+    }, 4000);
   };
 
   const handleGenerate = async (e?: React.FormEvent) => {
@@ -344,8 +347,8 @@ export const PromptGenerator: React.FC<PromptGeneratorProps> = ({
       {/* ABA 1: GERADOR INTELIGENTE COM IA */}
       {activeTab === 'ai' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Coluna Esquerda: Formulário de Configuração (5 colunas) */}
-          <div className="lg:col-span-5 bg-slate-900/60 border border-slate-900/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-6">
+          {/* Coluna Esquerda: Formulário de Configuração (5 colunas) - Fixa no topo ao rolar */}
+          <div className="lg:col-span-5 bg-slate-900/60 border border-slate-900/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-6 lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto custom-scrollbar">
             {/* PASSO 1: PALAVRAS-CHAVE DA IMAGEM */}
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -823,15 +826,16 @@ export const PromptGenerator: React.FC<PromptGeneratorProps> = ({
                         type="button"
                         onClick={() => handleCopy(variation.fullPromptWithParams, `main-${variation.id}`)}
                         className={`absolute top-2.5 right-2.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-md cursor-pointer ${
-                          copiedId === `main-${variation.id}`
-                            ? 'bg-emerald-600 text-white'
-                            : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                          copiedIds.has(`main-${variation.id}`)
+                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30 ring-1 ring-emerald-400/50'
+                            : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20'
                         }`}
+                        title={copiedIds.has(`main-${variation.id}`) ? "Prompt já copiado" : "Copiar prompt"}
                       >
-                        {copiedId === `main-${variation.id}` ? (
+                        {copiedIds.has(`main-${variation.id}`) ? (
                           <>
-                            <Check className="w-3.5 h-3.5" />
-                            <span>Copiado!</span>
+                            <Check className="w-3.5 h-3.5 text-white" />
+                            <span>Copiado</span>
                           </>
                         ) : (
                           <>
@@ -851,9 +855,20 @@ export const PromptGenerator: React.FC<PromptGeneratorProps> = ({
                         <button
                           type="button"
                           onClick={() => handleCopy(variation.negativePrompt || '', `neg-${variation.id}`)}
-                          className="shrink-0 px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded text-[11px] font-semibold cursor-pointer"
+                          className={`shrink-0 px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer border flex items-center gap-1 ${
+                            copiedIds.has(`neg-${variation.id}`)
+                              ? 'bg-emerald-600/90 hover:bg-emerald-500 text-white border-emerald-500'
+                              : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'
+                          }`}
                         >
-                          {copiedId === `neg-${variation.id}` ? 'Copiado!' : 'Copiar Negativo'}
+                          {copiedIds.has(`neg-${variation.id}`) ? (
+                            <>
+                              <Check className="w-3 h-3 text-white" />
+                              <span>Copiado</span>
+                            </>
+                          ) : (
+                            <span>Copiar Negativo</span>
+                          )}
                         </button>
                       </div>
                     )}
@@ -875,9 +890,20 @@ export const PromptGenerator: React.FC<PromptGeneratorProps> = ({
                         <button
                           type="button"
                           onClick={() => handleCopy(variation.suggestedKeywords.join(', '), `tags-${variation.id}`)}
-                          className="text-[10px] px-2 py-0.5 text-indigo-400 hover:text-indigo-300 font-bold ml-1 cursor-pointer"
+                          className={`text-[10px] px-2.5 py-0.5 rounded-md font-bold ml-1 transition-all cursor-pointer flex items-center gap-1 border ${
+                            copiedIds.has(`tags-${variation.id}`)
+                              ? 'bg-emerald-600/90 text-white border-emerald-500'
+                              : 'text-indigo-400 hover:text-indigo-300 border-transparent hover:bg-indigo-500/10'
+                          }`}
                         >
-                          {copiedId === `tags-${variation.id}` ? '✓ Copiado' : 'Copiar Todas'}
+                          {copiedIds.has(`tags-${variation.id}`) ? (
+                            <>
+                              <Check className="w-2.5 h-2.5 text-white" />
+                              <span>Copiado</span>
+                            </>
+                          ) : (
+                            <span>Copiar Todas</span>
+                          )}
                         </button>
                       </div>
                     )}
@@ -1028,8 +1054,8 @@ export const PromptGenerator: React.FC<PromptGeneratorProps> = ({
             </div>
           </div>
 
-          {/* Saída em Tempo Real (5 colunas) */}
-          <div className="lg:col-span-5 flex flex-col justify-between bg-slate-900/60 border border-slate-900/80 rounded-2xl p-6 shadow-xl space-y-5">
+          {/* Saída em Tempo Real (5 colunas) - Fixa no topo */}
+          <div className="lg:col-span-5 flex flex-col justify-between bg-slate-900/60 border border-slate-900/80 rounded-2xl p-6 shadow-xl space-y-5 lg:sticky lg:top-6 lg:self-start">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
@@ -1051,15 +1077,15 @@ export const PromptGenerator: React.FC<PromptGeneratorProps> = ({
                 type="button"
                 onClick={() => handleCopy(assembleBuilderPrompt(), 'builder-prompt')}
                 className={`w-full py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer ${
-                  copiedId === 'builder-prompt'
-                    ? 'bg-emerald-600 text-white'
+                  copiedIds.has('builder-prompt')
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30 ring-1 ring-emerald-400/50'
                     : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/30'
                 }`}
               >
-                {copiedId === 'builder-prompt' ? (
+                {copiedIds.has('builder-prompt') ? (
                   <>
-                    <Check className="w-4 h-4" />
-                    <span>Prompt Copiado com Sucesso!</span>
+                    <Check className="w-4 h-4 text-white" />
+                    <span>Copiado</span>
                   </>
                 ) : (
                   <>
@@ -1134,15 +1160,15 @@ export const PromptGenerator: React.FC<PromptGeneratorProps> = ({
                     type="button"
                     onClick={() => handleCopy(`${preset.promptEn} ${preset.parameters}`, preset.id)}
                     className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                      copiedId === preset.id
-                        ? 'bg-emerald-600 text-white'
+                      copiedIds.has(preset.id)
+                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30 ring-1 ring-emerald-400/50'
                         : 'bg-indigo-600 hover:bg-indigo-500 text-white'
                     }`}
                   >
-                    {copiedId === preset.id ? (
+                    {copiedIds.has(preset.id) ? (
                       <>
-                        <Check className="w-3.5 h-3.5" />
-                        <span>Copiado!</span>
+                        <Check className="w-3.5 h-3.5 text-white" />
+                        <span>Copiado</span>
                       </>
                     ) : (
                       <>
@@ -1289,15 +1315,15 @@ export const PromptGenerator: React.FC<PromptGeneratorProps> = ({
                       type="button"
                       onClick={() => handleCopy(prompt.fullPromptWithParams, `history-${prompt.id}`)}
                       className={`w-full py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                        copiedId === `history-${prompt.id}`
-                          ? 'bg-emerald-600 text-white'
+                        copiedIds.has(`history-${prompt.id}`)
+                          ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30 ring-1 ring-emerald-400/50'
                           : 'bg-slate-950 hover:bg-slate-850 text-indigo-300 border border-slate-800'
                       }`}
                     >
-                      {copiedId === `history-${prompt.id}` ? (
+                      {copiedIds.has(`history-${prompt.id}`) ? (
                         <>
-                          <Check className="w-3.5 h-3.5" />
-                          <span>Copiado!</span>
+                          <Check className="w-3.5 h-3.5 text-white" />
+                          <span>Copiado</span>
                         </>
                       ) : (
                         <>
